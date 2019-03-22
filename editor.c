@@ -65,12 +65,12 @@ int main(int argc, char *argv[]) {
 	broker_addr.sin_family=AF_INET;
 	broker_addr.sin_port=htons(port_n);
 
-	
+
 	if(connect(sd, (struct sockaddr *) &broker_addr, sizeof(broker_addr))==-1){
 		printf("Error in connection.\n");
 		exit(0);
 	}
-
+	printf("Connected\n");
 	num[0]=5;
 	num[1]=2;
 
@@ -78,12 +78,12 @@ int main(int argc, char *argv[]) {
 		printf("Error on sending.\n");
 		exit(0);
 	}
-	
+
 	if(recv(sd, &res, sizeof(int),0)==-1){
 		printf("Error on receiving.\n");
 		exit(0);
-	}	
-	
+	}
+
 	printf("Result = %d \n",res);
 	close(sd);
 

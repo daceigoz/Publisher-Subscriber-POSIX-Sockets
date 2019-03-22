@@ -42,10 +42,10 @@ int main(int argc, char *argv[]) {
 		printf("Error in creating socket.\n");
 		exit(0);
 	}
-	 
+
 	 val=1;
 	 setsockopt(sd,SOL_SOCKET, SO_REUSEADDR, (char*) &val, sizeof(int));
-	 
+
 	 bzero((char *) &broker_addr, sizeof(broker_addr));
 
 	 int port_n=atoi(port);
@@ -63,11 +63,11 @@ int main(int argc, char *argv[]) {
 	 }
 
 	size=sizeof(editor_addr);
-	
+
 	while(1){
 
 	printf("Waiting for connection\n");
-	
+
 	 if((sc=accept(sd,(struct sockaddr *)&editor_addr,&size))<0){
 		 perror("Error on accepting connection.\n");
 		 exit(0);
@@ -75,8 +75,8 @@ int main(int argc, char *argv[]) {
 	if(recv(sc, (char *) num, 2*sizeof(int),0)<0){
 		 perror("Error on receiving.\n");
 		 exit(0);
-	 }	
-	res=num[2]+num[1];
+	 }
+	res=num[0]+num[1];
 
 	if(send(sc, &res, sizeof(int),0)==-1){
 		printf("Error on sending.\n");
