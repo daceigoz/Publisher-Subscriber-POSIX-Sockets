@@ -18,12 +18,10 @@ int main(int argc, char *argv[]) {
 	char port[256]= "";
 	char topic[256]= "";
 	char text[1024]= "";
-	int sd;
+	int sd,res;
+	int num [2];
 	struct hostent *hp;
-	struct in_addr in;
-	struct sockaddr_in server_addr;
-	struct sockaddr *addr;
-	int addr_s;
+	struct sockaddr_in broker_addr;
 
 	while ((option = getopt(argc, argv,"h:p:t:m:")) != -1) {
 		switch (option) {
@@ -60,16 +58,34 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-	bzero((char*)&server_addr, sizeof(server_addr));
+	bzero((char*)&broker_addr, sizeof(broker_addr));
 	hp=gethostbyname(host);
 
-	memcpy(&(server_addr.sin_addr),hp->h_addr,hp->h_length);
-	server_addr.sin_family=AF_INET;
-	server_addr.sin_port=htons(port_n);
+	memcpy(&(broker_addr.sin_addr),hp->h_addr,hp->h_length);
+	broker_addr.sin_family=AF_INET;
+	broker_addr.sin_port=htons(port_n);
 
+	
+	if(connect(sd, (struct sockaddr *) &broker_addr, sizeof(broker_addr))==-1){
+		printf("Error in connection.\n");
+		exit(0);
+	}
 
+	num[0]=5;
+	num[1]=2;
 
-
+	if(send(sd, (char *) num, 2*sizeof(int),0)==-1){
+		printf("Error on sending.\n");
+		exit(0);
+	}
+	
+	if(recv(sd, &res, sizeof(int),0)==-1){
+		printf("Error on receiving.\n");
+		exit(0);
+	}	
+	
+	printf("Result = %d \n",res);
+	close(sd);
 
 
 	return 0;
