@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "node_t.h"
 
 void print_usage() {
 	    printf("Usage: editor -h host -p port -t \"topic\" -m \"text\"\n");
@@ -18,8 +19,9 @@ int main(int argc, char *argv[]) {
 	char port[256]= "";
 	char topic[256]= "";
 	char text[1024]= "";
+
+	char * action= "PUBLISH";
 	int sd,res;
-	int num [2];
 	struct hostent *hp;
 	struct sockaddr_in broker_addr;
 
@@ -71,18 +73,28 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 	printf("Connected\n");
-	num[0]=5;
-	num[1]=2;
 
-	if(send(sd, (char *) num, 2*sizeof(int),0)==-1){
+	if(send(sd, action, 1024,0)==-1){
 		printf("Error on sending.\n");
 		exit(0);
 	}
-
+	printf("Connected\n");
+/*
 	if(recv(sd, &res, sizeof(int),0)==-1){
 		printf("Error on receiving.\n");
 		exit(0);
 	}
+*/
+	if(send(sd, topic, 1024,0)==-1){
+		printf("Error on sending.\n");
+		exit(0);
+	}
+
+	if(send(sd, text, 1024,0)==-1){
+		printf("Error on sending.\n");
+		exit(0);
+	}
+
 
 	printf("Result = %d \n",res);
 	close(sd);

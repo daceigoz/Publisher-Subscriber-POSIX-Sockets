@@ -7,6 +7,9 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "node_t.h"
+
+struct node * head=NULL;
 
 void print_usage() {
 	    printf("Usage: broker -p port \n");
@@ -17,7 +20,7 @@ int main(int argc, char *argv[]) {
 	int val, sc,sd,res;
 	unsigned int size;
 	char port[256]= "";
-	int num [2];
+	char action[1024]= "";
 	struct sockaddr_in broker_addr, editor_addr;
 
 	while ((option = getopt(argc, argv,"p:")) != -1) {
@@ -63,26 +66,52 @@ int main(int argc, char *argv[]) {
 	 }
 
 	size=sizeof(editor_addr);
+	int action_rcv=0;
 
 	while(1){
 
-	printf("Waiting for connection\n");
+	printf("Waiting for action\n");
 
 	 if((sc=accept(sd,(struct sockaddr *)&editor_addr,&size))<0){
 		 perror("Error on accepting connection.\n");
 		 exit(0);
 	 }
-	if(recv(sc, (char *) num, 2*sizeof(int),0)<0){
-		 perror("Error on receiving.\n");
-		 exit(0);
-	 }
-	res=num[0]+num[1];
+	 while(action_rcv!=3){
+		if(action_rcv==1) printf("Waiting for topic\n");
+		else printf("Waiting for text\n");
+		if(recv(sc, action, sizeof(action),0)<0){
+			 perror("Error on receiving.\n");
+			 exit(0);
+		 }
+		 if(action_rcv==1){
+			 //topic received
+			 action_rcv=2;
+			 printf("TOPIC: %s\n",action);
+		 }
+		 else if(action_rcv==2){
+			 //topic received
+			 action_rcv=3;
+			 printf("TEXT: %s\n",action);
+		 }
+		 if(!strcmp(action,"PUBLISH")){
+			 action_rcv=1;
+			 printf("ACTION: %s\n",action);
+		 }
+		 else{
+			 action_rcv=3;
+			 
+
+		 }
+ }
+/*
+	res=0;
+
 
 	if(send(sc, &res, sizeof(int),0)==-1){
 		printf("Error on sending.\n");
 		exit(0);
 	}
-
+*/
 }
 	close(sd);
 	return 0;
