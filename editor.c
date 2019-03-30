@@ -17,11 +17,11 @@ int main(int argc, char *argv[]) {
 	int  option = 0;
 	char host[256]= "";
 	char port[256]= "";
-	char topic[256]= "";
+	char topic[128]= "";
 	char text[1024]= "";
 
 	char * action= "PUBLISH";
-	int sd,res;
+	int sd;
 	struct hostent *hp;
 	struct sockaddr_in broker_addr;
 
@@ -69,34 +69,32 @@ int main(int argc, char *argv[]) {
 
 
 	if(connect(sd, (struct sockaddr *) &broker_addr, sizeof(broker_addr))==-1){
-		printf("Error in connection.\n");
+		printf("Error in the connection to the server <%s>:<%d>\n",host,port_n);
 		exit(0);
 	}
-	printf("Connected\n");
+	printf("Connected to the server.\n");
 
 	if(send(sd, action, 1024,0)==-1){
-		printf("Error on sending.\n");
+		printf("Error on sending the action.\n");
 		exit(0);
 	}
-	printf("Connected\n");
+
 /*
 	if(recv(sd, &res, sizeof(int),0)==-1){
 		printf("Error on receiving.\n");
 		exit(0);
 	}
 */
-	if(send(sd, topic, 1024,0)==-1){
-		printf("Error on sending.\n");
+	if(send(sd, topic, 128,0)==-1){
+		printf("Error on sending the topic.\n");
 		exit(0);
 	}
 
 	if(send(sd, text, 1024,0)==-1){
-		printf("Error on sending.\n");
+		printf("Error on sending the text.\n");
 		exit(0);
 	}
 
-
-	printf("Result = %d \n",res);
 	close(sd);
 
 

@@ -5,7 +5,8 @@
 typedef struct node{
   struct node * next;
   char topic[MAX_SIZE];
-  char text[MAX_SIZE*4];
+  struct sockaddr *addr;
+  //Add IP and Socket addr of the subscriber in this node.
 } node_t;
 
 #endif

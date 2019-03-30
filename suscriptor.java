@@ -1,43 +1,78 @@
 import java.io.*;
+import java.lang.*;
+import java.util.*;
+import java.net.*;
 import gnu.getopt.Getopt;
 
 
 class suscriptor {
-	
+
 	/********************* TYPES **********************/
-	
-	
+
+	static Socket sc;
+	static OutputStream ostream;
+	static ObjectOutput s;
+	static DataInputStream istream;
+
 	/******************* ATTRIBUTES *******************/
-	
+
 	private static String _server   = null;
 	private static short _port = -1;
-		
-	
+	private static String action = null;
+	static int res;
+
+
 	/********************* METHODS ********************/
-	
-	static int subscribe(String topic) 
+
+	static int subscribe(String topic)
 	{
 		// Write your code here
-			
-		System.out.println("Subscribe to: " + topic);
-        
-		return 0;
+		try{
+			action="SUBSCRIBE";
+			s.writeObject(action);
+			s.flush();
+			s.writeObject(topic);
+			s.flush();
+			res=istream.readInt();
+	}
+		catch(Exception e){
+		System.out.print("NETWORK ERROR\n");
+	}
+		//0 if OK, 1 if fails
+		if(res==0)System.out.println("SUBSCRIBE OK");
+		else System.out.println("SUBSCRIBE FAIL");
+
+		return res;
 	}
 
-	static int unsubscribe(String topic) 
+	static int unsubscribe(String topic)
 	{
 		// Write your code here
-		System.out.println("Unsubscribe from: " + topic);
-        
-		return 0;
+		try{
+			action="UNSUBSCRIBE";
+			s.writeObject(action);
+			s.flush();
+			s.writeObject(topic);
+			s.flush();
+			res=istream.readInt();
 	}
-	
-	
-	
+		catch(Exception e){
+		System.out.print("NETWORK ERROR\n");
+	}
+		//0 if OK, 1 if topic doesnt exist, 2 if fails
+		if(res==0)System.out.println("UNSUBSCRIBE OK");
+		else if(res==2) System.out.println("UNSUBSCRIBE FAIL");
+		else System.out.println("TOPIC NOT SUBSCRIBED");
+
+		return res;
+	}
+
+
+
 	/**
 	 * @brief Command interpreter for the suscriptor. It calls the protocol functions.
 	 */
-	static void shell() 
+	static void shell()
 	{
 		boolean exit = false;
 		String input;
@@ -58,8 +93,8 @@ class suscriptor {
 						} else {
 							System.out.println("Syntax error. Usage: SUBSCRIBE <topic>");
 						}
-					} 
-					
+					}
+
 					/********** UNSUBSCRIBE ************/
 					else if (line[0].equals("UNSUBSCRIBE")) {
 						if  (line.length == 2) {
@@ -67,8 +102,8 @@ class suscriptor {
 						} else {
 							System.out.println("Syntax error. Usage: UNSUBSCRIBE <topic>");
 						}
-                    } 
-                    
+                    }
+
                     /************** QUIT **************/
                     else if (line[0].equals("QUIT")){
 						if (line.length == 1) {
@@ -76,32 +111,32 @@ class suscriptor {
 						} else {
 							System.out.println("Syntax error. Use: QUIT");
 						}
-					} 
-					
+					}
+
 					/************* UNKNOWN ************/
-					else {						
+					else {
 						System.out.println("Error: command '" + line[0] + "' not valid.");
 					}
-				}				
+				}
 			} catch (java.io.IOException e) {
 				System.out.println("Exception: " + e);
 				e.printStackTrace();
 			}
 		}
 	}
-	
+
 	/**
 	 * @brief Prints program usage
 	 */
-	static void usage() 
+	static void usage()
 	{
 		System.out.println("Usage: java -cp . suscriptor -s <server> -p <port>");
 	}
-	
+
 	/**
-	 * @brief Parses program execution arguments 
-	 */ 
-	static boolean parseArguments(String [] argv) 
+	 * @brief Parses program execution arguments
+	 */
+	static boolean parseArguments(String [] argv)
 	{
 		Getopt g = new Getopt("suscriptor", argv, "ds:p:");
 
@@ -127,10 +162,10 @@ class suscriptor {
 					System.out.print("getopt() returned " + c + "\n");
 			}
 		}
-		
+
 		if (_server == null)
 			return false;
-		
+
 		if ((_port < 1024) || (_port > 65535)) {
 			System.out.println("Error: Port must be in the range 1024 <= port <= 65535");
 			return false;
@@ -138,22 +173,38 @@ class suscriptor {
 
 		return true;
 	}
-	
-	
-	
+
+
+
 	/********************* MAIN **********************/
-	
-	public static void main(String[] argv) 
+
+	public static void main(String[] argv)
 	{
 		if(!parseArguments(argv)) {
 			usage();
 			return;
 		}
-		
 
-		// Write code here
-		
+
+				// Write code here
+		try{
+		sc=new Socket(_server,_port);
+		ostream=sc.getOutputStream();
+		s=new ObjectOutputStream(ostream);
+		istream=new DataInputStream(sc.getInputStream());
+	}
+		catch(Exception e){
+		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
+		System.exit(0);
+	}
+
 		shell();
+		try{
+		sc.close();
+	}
+	catch(Exception e){
+	}
+
 		System.out.println("+++ FINISHED +++");
 	}
 }
