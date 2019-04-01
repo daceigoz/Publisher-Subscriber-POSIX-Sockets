@@ -96,12 +96,12 @@ int main(int argc, char *argv[]) {
 
 	action_rcv=0;
 
-
+	printf("Waiting for action\n");
 	 if((sc=accept(sd,(struct sockaddr *)&editor_addr,&size))<0){
 		 perror("Error on accepting connection.\n");
 		 exit(0);
 	 }
-	 printf("Waiting for action\n");
+
 	 while(action_rcv!=3){
 			if(action_rcv==1) printf("Waiting for topic\n");
 			else if(action_rcv==2)printf("Waiting for text\n");
@@ -126,6 +126,7 @@ int main(int argc, char *argv[]) {
 			 					 			 printf("ACTION: %s\n",action);
 			 			}
 			 			else{
+											printf("ACTION: %s\n",action);
 			 								action_rcv=3;
 			 			}
 
@@ -149,6 +150,7 @@ int main(int argc, char *argv[]) {
 									 //Deliver text to the subscriptor of that node of the list.
 								 }
 							 }
+
 						 action_rcv=3;//3 if topic not found
 					 	}
 					 	else if(action_type==1){//SUBSCRIBE
@@ -202,7 +204,6 @@ int main(int argc, char *argv[]) {
 			 action_rcv=3;
 			 printf("TEXT: %s\n",action);
 		 }
-
 
 		 print_topics();
  }

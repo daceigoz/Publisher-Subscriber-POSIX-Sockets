@@ -10,7 +10,6 @@ class suscriptor {
 	/********************* TYPES **********************/
 
 	static Socket sc;
-	static OutputStream ostream;
 	static ObjectOutput s;
 	static DataInputStream istream;
 
@@ -189,8 +188,7 @@ class suscriptor {
 				// Write code here
 		try{
 		sc=new Socket(_server,_port);
-		ostream=sc.getOutputStream();
-		s=new ObjectOutputStream(ostream);
+		s=new ObjectOutputStream(sc.getOutputStream());
 		istream=new DataInputStream(sc.getInputStream());
 	}
 		catch(Exception e){
