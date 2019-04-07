@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "lines.h"
 #include "node_t.h"
 
 struct node * head=NULL;
@@ -36,6 +37,7 @@ int main(int argc, char *argv[]) {
 	unsigned int size;
 	char port[256]= "";
 	char action[1024]= "";
+	char topic[128]="";
 	struct sockaddr_in broker_addr, editor_addr;
 
 	while ((option = getopt(argc, argv,"p:")) != -1) {
@@ -105,7 +107,7 @@ int main(int argc, char *argv[]) {
 	 while(action_rcv!=3){
 			if(action_rcv==1) printf("Waiting for topic\n");
 			else if(action_rcv==2)printf("Waiting for text\n");
-			if(recv(sc, action, 1024,0)<0){
+			if(readLine(sc, action, 1024)<0){
 				 perror("Error on receiving.\n");
 				 exit(0);
 			 }
@@ -131,12 +133,12 @@ int main(int argc, char *argv[]) {
 			 			}
 
 		 if(action_rcv==1){
-			 if(recv(sc, action, 1024,0)<0){
+			 if(readLine(sc, topic, 128)<0){
 					perror("Error on receiving.\n");
 					exit(0);
 				}
 			 //topic received
-			 printf("TOPIC: %s\n",action);
+			 printf("TOPIC: %s\n",topic);
 						 if(action_type==0){//PUBLISH action
 							 if(!empty){
 								 while(aux1->next!=NULL){

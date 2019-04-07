@@ -7,6 +7,7 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include "lines.h"
 #include "node_t.h"
 
 void print_usage() {
@@ -17,8 +18,8 @@ int main(int argc, char *argv[]) {
 	int  option = 0;
 	char host[256]= "";
 	char port[256]= "";
-	char topic[128]= "";
-	char text[1024]= "";
+	char topic[128]="";
+	char text[1024]="";
 
 	char * action= "PUBLISH";
 	int sd;
@@ -74,7 +75,7 @@ int main(int argc, char *argv[]) {
 	}
 	printf("Connected to the server.\n");
 
-	if(send(sd, action, 1024,0)==-1){
+	if(writeLine(sd, action, strlen(action))==-1){
 		printf("Error on sending the action.\n");
 		exit(0);
 	}
@@ -85,12 +86,12 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 */
-	if(send(sd, topic, 128,0)==-1){
+	if(writeLine(sd, topic, strlen(topic))==-1){
 		printf("Error on sending the topic.\n");
 		exit(0);
 	}
 
-	if(send(sd, text, 1024,0)==-1){
+	if(writeLine(sd, text, strlen(text))==-1){
 		printf("Error on sending the text.\n");
 		exit(0);
 	}

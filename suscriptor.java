@@ -27,7 +27,16 @@ class suscriptor {
 	{
 		// Write your code here
 		try{
-			action="SUBSCRIBE";
+		sc=new Socket(_server,_port);
+		s=new ObjectOutputStream(sc.getOutputStream());
+		istream=new DataInputStream(sc.getInputStream());
+	}
+		catch(Exception e){
+		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
+		System.exit(0);
+	}
+		try{
+			action="SUBSCRIBE\0";
 			s.writeObject(action);
 			s.flush();
 			s.writeObject(topic);
@@ -41,6 +50,11 @@ class suscriptor {
 		if(res==0)System.out.println("SUBSCRIBE OK");
 		else System.out.println("SUBSCRIBE FAIL");
 
+		try{
+		sc.close();
+		}
+		catch(Exception e){
+		}
 		return res;
 	}
 
@@ -48,7 +62,17 @@ class suscriptor {
 	{
 		// Write your code here
 		try{
-			action="UNSUBSCRIBE";
+		sc=new Socket(_server,_port);
+		s=new ObjectOutputStream(sc.getOutputStream());
+		istream=new DataInputStream(sc.getInputStream());
+	}
+		catch(Exception e){
+		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
+		System.exit(0);
+	}
+		System.out.println("Got here.");
+		try{
+			action="UNSUBSCRIBE\0";
 			s.writeObject(action);
 			s.flush();
 			s.writeObject(topic);
@@ -63,6 +87,11 @@ class suscriptor {
 		else if(res==2) System.out.println("UNSUBSCRIBE FAIL");
 		else System.out.println("TOPIC NOT SUBSCRIBED");
 
+		try{
+		sc.close();
+		}
+		catch(Exception e){
+		}
 		return res;
 	}
 
@@ -186,22 +215,9 @@ class suscriptor {
 
 
 				// Write code here
-		try{
-		sc=new Socket(_server,_port);
-		s=new ObjectOutputStream(sc.getOutputStream());
-		istream=new DataInputStream(sc.getInputStream());
-	}
-		catch(Exception e){
-		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
-		System.exit(0);
-	}
 
 		shell();
-		try{
-		sc.close();
-	}
-	catch(Exception e){
-	}
+
 
 		System.out.println("+++ FINISHED +++");
 	}
