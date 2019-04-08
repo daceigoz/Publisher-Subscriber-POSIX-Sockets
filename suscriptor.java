@@ -25,6 +25,7 @@ class suscriptor {
 
 	static int subscribe(String topic)
 	{
+		topic=topic+'\0';
 		// Write your code here
 		try{
 		sc=new Socket(_server,_port);
@@ -37,9 +38,9 @@ class suscriptor {
 	}
 		try{
 			action="SUBSCRIBE\0";
-			s.writeObject(action);
+			s.writeObject(action.getBytes());
 			s.flush();
-			s.writeObject(topic);
+			s.writeObject(topic.getBytes());
 			s.flush();
 			res=istream.readInt();
 	}

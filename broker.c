@@ -15,7 +15,7 @@ int empty=1;
 int existing_topic=0;
 int res;
 
-void print_topics(){
+void print_list(){
 	if(!empty){
 		printf("Printing the current list of topics.\n");
 		struct node * aux1=head;
@@ -103,6 +103,7 @@ int main(int argc, char *argv[]) {
 		 perror("Error on accepting connection.\n");
 		 exit(0);
 	 }
+	 printf("Editor_addr data: %d\n", editor_addr.sin_port);
 
 	 while(action_rcv!=3){
 			if(action_rcv==1) printf("Waiting for topic\n");
@@ -128,7 +129,7 @@ int main(int argc, char *argv[]) {
 			 					 			 printf("ACTION: %s\n",action);
 			 			}
 			 			else{
-											printf("ACTION: %s\n",action);
+											printf("Unknown action received\n");
 			 								action_rcv=3;
 			 			}
 
@@ -149,7 +150,7 @@ int main(int argc, char *argv[]) {
 									 aux1=aux1->next;
 								 }
 								 if(!strcmp(aux1->topic,action)){
-									 //Deliver text to the subscriptor of that node of the list.
+									 //Deliver text to the subscriptor of that node of the list (for the last element of the list).
 								 }
 							 }
 
@@ -207,7 +208,8 @@ int main(int argc, char *argv[]) {
 			 printf("TEXT: %s\n",action);
 		 }
 
-		 print_topics();
+		 print_list();
+		 printf("--------------------------\n");
  }
 /*
 	res=0;
