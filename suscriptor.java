@@ -10,7 +10,7 @@ class suscriptor {
 	/********************* TYPES **********************/
 
 	static Socket sc;
-	static ObjectOutput s;
+	static BufferedOutputStream s;
 	static DataInputStream istream;
 
 	/******************* ATTRIBUTES *******************/
@@ -18,7 +18,7 @@ class suscriptor {
 	private static String _server   = null;
 	private static short _port = -1;
 	private static String action = null;
-	static int res;
+	static int res=-1;
 
 
 	/********************* METHODS ********************/
@@ -29,7 +29,7 @@ class suscriptor {
 		// Write your code here
 		try{
 		sc=new Socket(_server,_port);
-		s=new ObjectOutputStream(sc.getOutputStream());
+		s=new BufferedOutputStream(sc.getOutputStream());
 		istream=new DataInputStream(sc.getInputStream());
 	}
 		catch(Exception e){
@@ -37,10 +37,10 @@ class suscriptor {
 		System.exit(0);
 	}
 		try{
-			action="SUBSCRIBE\0";
-			s.writeObject(action.getBytes());
+			action="SUBSCRIBE"+'\0';
+			s.write(action.getBytes());
 			s.flush();
-			s.writeObject(topic.getBytes());
+			s.write(topic.getBytes());
 			s.flush();
 			res=istream.readInt();
 	}
@@ -59,7 +59,7 @@ class suscriptor {
 		return res;
 	}
 
-	static int unsubscribe(String topic)
+	/*static int unsubscribe(String topic)
 	{
 		// Write your code here
 		try{
@@ -94,7 +94,7 @@ class suscriptor {
 		catch(Exception e){
 		}
 		return res;
-	}
+	}*/
 
 
 
@@ -127,7 +127,7 @@ class suscriptor {
 					/********** UNSUBSCRIBE ************/
 					else if (line[0].equals("UNSUBSCRIBE")) {
 						if  (line.length == 2) {
-							unsubscribe(line[1]); // topic = line[1]
+							//unsubscribe(line[1]); // topic = line[1]
 						} else {
 							System.out.println("Syntax error. Usage: UNSUBSCRIBE <topic>");
 						}

@@ -157,6 +157,7 @@ int main(int argc, char *argv[]) {
 						 action_rcv=3;//3 if topic not found
 					 	}
 					 	else if(action_type==1){//SUBSCRIBE
+							printf("Got here\n");
 			 			 	strcpy(aux2->topic, action);
 							getpeername(sc,aux2->addr,&size);
 							int return_value=0;
