@@ -38,6 +38,7 @@ int main(int argc, char *argv[]) {
 	char port[256]= "";
 	char action[1024]= "";
 	char topic[128]="";
+	char text[1024]="";
 	struct sockaddr_in broker_addr, editor_addr;
 
 	while ((option = getopt(argc, argv,"p:")) != -1) {
@@ -86,14 +87,15 @@ int main(int argc, char *argv[]) {
 	int action_rcv=0;
 	int action_type=0;
 
+	while(1){
+
+	struct node * aux1=head;
 
 	struct node * aux2=malloc(sizeof(struct node));
 	strcpy(aux2->topic, "");
 	aux2->next=NULL;
 
-	while(1){
 
-	struct node * aux1=head;
 	existing_topic=0;
 
 	action_rcv=0;
@@ -103,37 +105,37 @@ int main(int argc, char *argv[]) {
 		 perror("Error on accepting connection.\n");
 		 exit(0);
 	 }
-	 printf("Editor_addr data: %d\n", editor_addr.sin_port);
 
 	 while(action_rcv!=3){
-			if(action_rcv==1) printf("Waiting for topic\n");
-			else if(action_rcv==2)printf("Waiting for text\n");
-			if(readLine(sc, action, 1024)<0){
-				 perror("Error on receiving.\n");
-				 exit(0);
-			 }
+		 if(action_rcv==0){
+				if(readLine(sc, action, 1024)<0){
+					 perror("Error on receiving.\n");
+					 exit(0);
+				 }
 
-			 			if(!strcmp(action,"PUBLISH")){
-			 					 			 action_rcv=1;
-			 								 action_type=0;
-			 					 			 printf("ACTION: %s\n",action);
-			 			}
-			 			else if(!strcmp(action,"SUBSCRIBE")){
-			 					 			 action_rcv=1;
-			 								 action_type=1;
-			 					 			 printf("ACTION: %s\n",action);
-			 			}
-			 			else if(!strcmp(action,"UNSUBSCRIBE")){
-			 					 			 action_rcv=1;
-			 								 action_type=2;
-			 					 			 printf("ACTION: %s\n",action);
-			 			}
-			 			else{
-											printf("Unknown action received\n");
-			 								action_rcv=3;
-			 			}
+				 			if(!strcmp(action,"PUBLISH")){
+				 					 			 action_rcv=1;
+				 								 action_type=0;
+				 					 			 printf("ACTION: %s\n",action);
+				 			}
+				 			else if(!strcmp(action,"SUBSCRIBE")){
+				 					 			 action_rcv=1;
+				 								 action_type=1;
+				 					 			 printf("ACTION: %s\n",action);
+				 			}
+				 			else if(!strcmp(action,"UNSUBSCRIBE")){
+				 					 			 action_rcv=1;
+				 								 action_type=2;
+				 					 			 printf("ACTION: %s\n",action);
+				 			}
+				 			else{
+												printf("Unknown action received\n");
+				 								action_rcv=3;
+				 			}
+					}
 
 		 if(action_rcv==1){
+			 printf("Waiting for topic\n");
 			 if(readLine(sc, topic, 128)<0){
 					perror("Error on receiving.\n");
 					exit(0);
@@ -154,16 +156,14 @@ int main(int argc, char *argv[]) {
 								 }
 							 }
 
-						 action_rcv=3;//3 if topic not found
+						 action_rcv=2;
 					 	}
 					 	else if(action_type==1){//SUBSCRIBE
-							printf("Got here\n");
-			 			 	strcpy(aux2->topic, action);
+			 			 	strcpy(aux2->topic, topic);
 							getpeername(sc,aux2->addr,&size);
 							int return_value=0;
 							if(empty){
 								head=aux2;
-								empty=0;
 								return_value=0;
 							}
 							else{
@@ -173,13 +173,15 @@ int main(int argc, char *argv[]) {
 								//Appending a new tuple topic/subscriber to the list.
 
 								aux1->next=aux2;
-								}
+							}
 
-								if(send(sc, &return_value, sizeof(int),0)==-1){
-									printf("Error on sending.\n");
-									exit(0);
-								}
-							action_rcv=2;
+							empty=0;
+
+							if(send(sc, &return_value, sizeof(int),0)==-1){
+								printf("Error on sending.\n");
+								exit(0);
+							}
+							action_rcv=3;
 						}
 						else{//UNSUBSCRIBE
 							if(empty){
@@ -199,18 +201,26 @@ int main(int argc, char *argv[]) {
 								 aux1->next=aux2;
 							 }
 							}
-						action_rcv=2;
+						action_rcv=3;
 						}
 			}
 
 		 else if(action_rcv==2){
 			 //topic received
 			 action_rcv=3;
-			 printf("TEXT: %s\n",action);
+			 printf("Waiting for text\n");
+			 if(readLine(sc, text, 1024)<0){
+ 				 perror("Error on receiving.\n");
+ 				 exit(0);
+ 			 }
+			 printf("TEXT: %s\n",text);
 		 }
 
 		 print_list();
-		 printf("--------------------------\n");
+
+		 if(action_rcv==3){
+			 printf("--------------------------\n");
+		 }
  }
 /*
 	res=0;
