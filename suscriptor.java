@@ -25,6 +25,7 @@ class suscriptor {
 
 	static int subscribe(String topic)
 	{
+		res=1;
 		topic=topic+'\0';
 		// Write your code here
 		try{
@@ -59,24 +60,25 @@ class suscriptor {
 		return res;
 	}
 
-	/*static int unsubscribe(String topic)
+	static int unsubscribe(String topic)
 	{
+		res=1;
+		topic=topic+'\0';
 		// Write your code here
 		try{
-		sc=new Socket(_server,_port);
-		s=new ObjectOutputStream(sc.getOutputStream());
-		istream=new DataInputStream(sc.getInputStream());
+			sc=new Socket(_server,_port);
+			s=new BufferedOutputStream(sc.getOutputStream());
+			istream=new DataInputStream(sc.getInputStream());
 	}
 		catch(Exception e){
 		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
 		System.exit(0);
 	}
-		System.out.println("Got here.");
 		try{
-			action="UNSUBSCRIBE\0";
-			s.writeObject(action);
+			action="UNSUBSCRIBE"+'\0';
+			s.write(action.getBytes());
 			s.flush();
-			s.writeObject(topic);
+			s.write(topic.getBytes());
 			s.flush();
 			res=istream.readInt();
 	}
@@ -94,7 +96,7 @@ class suscriptor {
 		catch(Exception e){
 		}
 		return res;
-	}*/
+	}
 
 
 
@@ -127,7 +129,7 @@ class suscriptor {
 					/********** UNSUBSCRIBE ************/
 					else if (line[0].equals("UNSUBSCRIBE")) {
 						if  (line.length == 2) {
-							//unsubscribe(line[1]); // topic = line[1]
+							unsubscribe(line[1]); // topic = line[1]
 						} else {
 							System.out.println("Syntax error. Usage: UNSUBSCRIBE <topic>");
 						}

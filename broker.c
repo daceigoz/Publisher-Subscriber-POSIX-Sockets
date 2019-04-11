@@ -16,12 +16,15 @@ int existing_topic=0;
 int res;
 
 void print_list(){
+	if(head==NULL) empty=1;
 	if(!empty){
 		printf("Printing the current list of topics.\n");
 		struct node * aux1=head;
 		printf("TOPIC: %s\n", aux1->topic);
+		printf("ADDRESS: %s\n", aux1->addr);
 		while(aux1->next!=NULL){
 			printf("TOPIC: %s\n", aux1->next->topic);
+			printf("ADDRESS: %s\n", aux1->next->addr);
 			aux1=aux1->next;
 		}
 	}
@@ -40,6 +43,7 @@ int main(int argc, char *argv[]) {
 	char topic[128]="";
 	char text[1024]="";
 	struct sockaddr_in broker_addr, editor_addr;
+	struct sockaddr_storage addr;
 
 	while ((option = getopt(argc, argv,"p:")) != -1) {
 		switch (option) {
@@ -160,21 +164,34 @@ int main(int argc, char *argv[]) {
 					 	}
 					 	else if(action_type==1){//SUBSCRIBE
 			 			 	strcpy(aux2->topic, topic);
-							getpeername(sc,aux2->addr,&size);
+							getpeername(sc,(struct sockaddr*)&addr,&size);
+							struct sockaddr_in *s=(struct sockaddr_in*)&addr;
+							inet_ntop(AF_INET,&s->sin_addr,aux2->addr,sizeof aux2->addr);
 							int return_value=0;
 							if(empty){
 								head=aux2;
 								return_value=0;
 							}
 							else{
-								while(aux1->next!=NULL){
-									aux1=aux1->next;
+								if(strcmp(head->addr,aux2->addr)==0&&strcmp(head->topic,aux2->topic)==0){
+									return_value=1;
 								}
-								//Appending a new tuple topic/subscriber to the list.
+								else{
 
-								aux1->next=aux2;
+									while(aux1->next!=NULL&&(strcmp(aux1->addr,aux2->addr)!=0||strcmp(aux1->topic,aux2->topic)!=0)){
+										aux1=aux1->next;
+									}
+									if(strcmp(aux1->addr,aux2->addr)==0&&strcmp(aux1->topic,aux2->topic)==0){ //SUBSCRIPTION already EXISTS
+										return_value=1;
+
+									}
+									else{
+									//Appending a new tuple topic/subscriber to the list.
+									aux1->next=aux2;
+
+								}
 							}
-
+						}
 							empty=0;
 
 							if(send(sc, &return_value, sizeof(int),0)==-1){
@@ -184,22 +201,36 @@ int main(int argc, char *argv[]) {
 							action_rcv=3;
 						}
 						else{//UNSUBSCRIBE
+
+							strcpy(aux2->topic, topic);
+							getpeername(sc,(struct sockaddr*)&addr,&size);
+							struct sockaddr_in *s=(struct sockaddr_in*)&addr;
+							inet_ntop(AF_INET,&s->sin_addr,aux2->addr,sizeof aux2->addr);
 							if(empty){
 								res=1;//TOPIC NOT FOUND
 							}
 							else{
-								while(aux1->next!=NULL){
-									if(!strcmp(aux1->topic,action)){
-										existing_topic=1;
+								if(!strcmp(head->topic,topic)&&!strcmp(head->addr,aux2->addr)){//CHECKING HEAD
+									head=head->next;
+									res=0;
+								}
+								else{
+									while(aux1!=NULL&&(strcmp(aux1->topic,topic)!=0||strcmp(aux1->addr,aux2->addr)!=0)){
+										aux2=aux1;
+										aux1=aux1->next;
 									}
-									aux1=aux1->next;
+									if(aux1==NULL){
+										res=1;//TOPIC NOT FOUND
+									}
+									else {
+									aux2->next=aux1->next;//change pointers
+									res=0;
+									}
 								}
-								if(!strcmp(aux1->topic,action)){
-									existing_topic=1;
-								}
-								if(!existing_topic){
-								 aux1->next=aux2;
-							 }
+						}
+							if(send(sc, &res, sizeof(int),0)==-1){
+								printf("Error on sending.\n");
+								exit(0);
 							}
 						action_rcv=3;
 						}
