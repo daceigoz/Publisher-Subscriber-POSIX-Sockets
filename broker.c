@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 	action_rcv=0;
 
 	printf("Waiting for action\n");
-	 if((sc=accept(sd,(struct sockaddr *)&editor_addr,&size))<0){
+	 if((sc=accept(sd,(struct sockaddr *)&editor_addr,&size))<0){ //GUARDAR PARA RESPONDER (CAMBIAR LA ESTRUCTURA POR IN_ADDR)
 		 perror("Error on accepting connection.\n");
 		 exit(0);
 	 }
@@ -151,7 +151,7 @@ int main(int argc, char *argv[]) {
 								 while(aux1->next!=NULL){
 
 									 if(!strcmp(aux1->topic,action)){
-										 //Deliver text to the subscriptor of that node of the list.
+										 //Deliver text to the subscriptor of that node of the list. IN ADDR
 									 }
 									 aux1=aux1->next;
 								 }
