@@ -105,7 +105,7 @@ int main(int argc, char *argv[]) {
 	action_rcv=0;
 
 	printf("Waiting for action\n");
-	 if((sc=accept(sd,(struct sockaddr *)&editor_addr,&size))<0){ //GUARDAR PARA RESPONDER (CAMBIAR LA ESTRUCTURA POR IN_ADDR)
+	 if((sc=accept(sd,(struct sockaddr *)&editor_addr,&size))<0){
 		 perror("Error on accepting connection.\n");
 		 exit(0);
 	 }
@@ -148,14 +148,62 @@ int main(int argc, char *argv[]) {
 			 printf("TOPIC: %s\n",topic);
 						 if(action_type==0){//PUBLISH action
 							 if(!empty){
+								 aux1=head;
 								 while(aux1->next!=NULL){
+									 if(!strcmp(aux1->topic,topic)){
+										 printf("Found a subscriber to the received topic\n");
+										 struct sockaddr_in sub_addr;
+										 int st;
+										 if((st=socket(AF_INET,SOCK_STREAM,6))==-1){ //st for send text
+									 		printf("Error in creating socket.\n");
+											}
+											int v=1;
+									 	 	setsockopt(st,SOL_SOCKET, SO_REUSEADDR, (char*) &v, sizeof(int));
 
-									 if(!strcmp(aux1->topic,action)){
-										 //Deliver text to the subscriptor of that node of the list. IN ADDR
+											bzero((char *) &sub_addr, sizeof(sub_addr));
+
+											memcpy(&(sub_addr.sin_addr), aux2->addr, sizeof(aux2->addr));
+											sub_addr.sin_family=AF_INET;
+											sub_addr.sin_port=htons(port_n);
+
+											printf("Got here!\n");
+											if(connect(st, (struct sockaddr *) &sub_addr, sizeof(sub_addr))==-1){
+												printf("Error in the connection to the subscriptor\n");
+												exit(0);
+											}
+											printf("Got after connect!\n");
+
+											close(st);
+
+										 //Deliver text to the subscriptor of that node of the list.
 									 }
 									 aux1=aux1->next;
 								 }
-								 if(!strcmp(aux1->topic,action)){
+								 if(!strcmp(aux1->topic,topic)){
+									 printf("Found a subscriber to the received topic\n");
+									 struct sockaddr_in sub_addr;
+									 int st;
+									 if((st=socket(AF_INET,SOCK_STREAM,6))==-1){ //st for send text
+										printf("Error in creating socket.\n");
+										}
+										int v=1;
+										setsockopt(st,SOL_SOCKET, SO_REUSEADDR, (char*) &v, sizeof(int));
+
+										bzero((char *) &sub_addr, sizeof(sub_addr));
+
+										memcpy(&(sub_addr.sin_addr), aux2->addr, sizeof(aux2->addr));
+										sub_addr.sin_family=AF_INET;
+										sub_addr.sin_port=htons(port_n);
+
+										printf("Got here!\n");
+										if(connect(st, (struct sockaddr *) &sub_addr, sizeof(sub_addr))==-1){
+											printf("Error in the connection to the subscriptor\n");
+											exit(0);
+										}
+										printf("Got after connect!\n");
+
+										close(st);
+
 									 //Deliver text to the subscriptor of that node of the list (for the last element of the list).
 								 }
 							 }
@@ -171,6 +219,7 @@ int main(int argc, char *argv[]) {
 							if(empty){
 								head=aux2;
 								return_value=0;
+								empty=0;
 							}
 							else{
 								if(strcmp(head->addr,aux2->addr)==0&&strcmp(head->topic,aux2->topic)==0){
@@ -247,9 +296,8 @@ int main(int argc, char *argv[]) {
 			 printf("TEXT: %s\n",text);
 		 }
 
-		 print_list();
-
 		 if(action_rcv==3){
+			 print_list();
 			 printf("--------------------------\n");
 		 }
  }
