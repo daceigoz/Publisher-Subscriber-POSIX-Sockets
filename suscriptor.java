@@ -4,8 +4,38 @@ import java.util.*;
 import java.net.*;
 import gnu.getopt.Getopt;
 
+class MultithreadingDemo extends Thread
+{
+    public void run(Socket sc){
+      Scanner in=null;
+        try{
+            in=new Scanner(sc.getInputStream());
+            String line=in.nextLine();
+            while(true){
+              System.out.println(line);
+              line=in.nextLine();
+            }
 
-class suscriptor {
+          }
+          catch(IOException e){
+          }
+
+
+
+        }
+			/*	BufferedReader input=new BufferedReader(new InputStreamReader(istream));
+            while(true){
+							try{
+							input.readLine();
+						}
+							catch(Exception e){
+							System.out.print("Error in reading the text.\n");
+							System.exit(0);
+						}
+    			}*/
+				}
+
+public class suscriptor{
 
 	/********************* TYPES **********************/
 
@@ -29,9 +59,9 @@ class suscriptor {
 		topic=topic+'\0';
 		// Write your code here
 		try{
-		sc=new Socket(_server,_port);
-		s=new BufferedOutputStream(sc.getOutputStream());
-		istream=new DataInputStream(sc.getInputStream());
+			sc=new Socket(_server,_port);
+			s=new BufferedOutputStream(sc.getOutputStream());
+			istream=new DataInputStream(sc.getInputStream());
 	}
 		catch(Exception e){
 		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
@@ -49,14 +79,15 @@ class suscriptor {
 		System.out.print("NETWORK ERROR\n");
 	}
 		//0 if OK, 1 if fails
-		if(res==0)System.out.println("SUBSCRIBE OK");
+		if(res==0){
+		System.out.println("SUBSCRIBE OK");
+		MultithreadingDemo object = new MultithreadingDemo();
+    object.start();
+		object.run(sc);
+	}
 		else System.out.println("SUBSCRIBE FAIL");
 
-		try{
-		sc.close();
-		}
-		catch(Exception e){
-		}
+
 		return res;
 	}
 
@@ -82,19 +113,14 @@ class suscriptor {
 			s.flush();
 			res=istream.readInt();
 	}
-		catch(Exception e){
-		System.out.print("NETWORK ERROR\n");
-	}
+	catch(Exception e){
+	System.out.print("NETWORK ERROR\n");
+}
 		//0 if OK, 1 if topic doesnt exist, 2 if fails
 		if(res==0)System.out.println("UNSUBSCRIBE OK");
 		else if(res==2) System.out.println("UNSUBSCRIBE FAIL");
 		else System.out.println("TOPIC NOT SUBSCRIBED");
 
-		try{
-		sc.close();
-		}
-		catch(Exception e){
-		}
 		return res;
 	}
 
@@ -216,8 +242,6 @@ class suscriptor {
 			return;
 		}
 
-
-				// Write code here
 
 		shell();
 
