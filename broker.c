@@ -95,6 +95,7 @@ void * socketThread(void *arg){
 									 while(aux1->next!=NULL){
 										 if(!strcmp(aux1->topic,topic)){
 											 printf("Found a subscriber to the received topic\n");
+
 											 struct sockaddr_in sub_addr;
 											 int st;
 											 if((st=socket(AF_INET,SOCK_STREAM,6))==-1){ //st for send text
@@ -105,11 +106,13 @@ void * socketThread(void *arg){
 
 												bzero((char *) &sub_addr, sizeof(sub_addr));
 
-												memcpy(&(sub_addr.sin_addr), aux2->addr, sizeof(aux2->addr));
+												memcpy(&(sub_addr.sin_addr), aux1->addr, sizeof(aux1->addr));
 												sub_addr.sin_family=AF_INET;
-												sub_addr.sin_port=ntohs(aux2->port);
+												sub_addr.sin_port=ntohs(aux1->port);
 
 												printf("Got here!\n");
+												fprintf(stderr,"  port %d \n",  aux1->port);
+
 												if(connect(st, (struct sockaddr *) &sub_addr, sizeof(sub_addr))==-1){
 													printf("Error in the connection to the subscriptor\n");
 													exit(0);
@@ -154,9 +157,18 @@ void * socketThread(void *arg){
 							 action_rcv=2;
 						 	}
 						 	else if(action_type==1){//SUBSCRIBE
+								char myport[128];
+								int port=0;
+								if(readLine(newSocket, myport, 128)<0){
+									 perror("Error on receiving.\n");
+									 exit(0);
+								 }
+
+								 port=atoi(myport);
+								 //if port <0 error
 				 			 	strcpy(aux2->topic, topic);
 								struct sockaddr_in *s=(struct sockaddr_in*)&addr;
-								aux2->port=ntohs(s->sin_port);
+								aux2->port=ntohs(port);
 								inet_ntop(AF_INET,&s->sin_addr,aux2->addr,sizeof aux2->addr);
 
 								int return_value=0;

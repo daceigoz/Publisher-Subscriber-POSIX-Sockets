@@ -6,12 +6,21 @@ import gnu.getopt.Getopt;
 
 class MultithreadingDemo extends Thread
 {
-    public void run(Socket sc){
+
+  ServerSocket ssc;
+    public MultithreadingDemo (ServerSocket sc){
+        ssc=sc;
+    }
+
+    public void run(){
       Scanner in=null;
         try{
-            in=new Scanner(sc.getInputStream());
-            String line=in.nextLine();
+          System.out.println ("port " + ssc.getLocalPort());
             while(true){
+              Socket sc=ssc.accept();
+              in=new Scanner(sc.getInputStream());
+              String line=in.nextLine();
+
               System.out.println(line);
               line=in.nextLine();
             }
@@ -55,6 +64,8 @@ public class suscriptor{
 
 	static int subscribe(String topic)
 	{
+    ServerSocket ssc;
+    int sc_port=0;
 		res=1;
 		topic=topic+'\0';
 		// Write your code here
@@ -62,6 +73,12 @@ public class suscriptor{
 			sc=new Socket(_server,_port);
 			s=new BufferedOutputStream(sc.getOutputStream());
 			istream=new DataInputStream(sc.getInputStream());
+
+      ssc= new ServerSocket(0);
+      sc_port=ssc.getLocalPort();
+
+  		MultithreadingDemo object = new MultithreadingDemo(ssc);
+      object.start();
 	}
 		catch(Exception e){
 		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
@@ -69,10 +86,14 @@ public class suscriptor{
 	}
 		try{
 			action="SUBSCRIBE"+'\0';
+      String portbuf=String.valueOf(sc_port)+'\0';
+
 			s.write(action.getBytes());
 			s.flush();
 			s.write(topic.getBytes());
 			s.flush();
+      s.write(portbuf.getBytes());
+      s.flush();
 			res=istream.readInt();
 	}
 		catch(Exception e){
@@ -81,9 +102,8 @@ public class suscriptor{
 		//0 if OK, 1 if fails
 		if(res==0){
 		System.out.println("SUBSCRIBE OK");
-		MultithreadingDemo object = new MultithreadingDemo();
-    object.start();
-		object.run(sc);
+
+
 	}
 		else System.out.println("SUBSCRIBE FAIL");
 
