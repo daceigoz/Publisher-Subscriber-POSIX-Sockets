@@ -51,8 +51,7 @@ void * socketThread(void *arg){
 		int action_rcv=0;
 		int action_type=0;
 		int newSocket = *((int *)arg);
-		while(1){
-				//printf("Waiting for action\n");
+
 		 while(action_rcv!=3){
 			 if(action_rcv==0){
 					if(readLine(newSocket, action, 1024)<0){
@@ -90,6 +89,13 @@ void * socketThread(void *arg){
 				 //topic received
 				 printf("TOPIC: %s\n",topic);
 							 if(action_type==0){//PUBLISH action
+								 printf("Waiting for text\n");
+								 if(readLine(newSocket, text, 128)<0){
+										perror("Error on receiving.\n");
+										exit(0);
+									}
+								 //topic received
+								 printf("TOPIC: %s\n",topic);
 								 if(!empty){
 									 aux1=head;
 									 while(aux1->next!=NULL){
@@ -98,20 +104,21 @@ void * socketThread(void *arg){
 
 											 struct sockaddr_in sub_addr;
 											 int st;
-											 if((st=socket(AF_INET,SOCK_STREAM,6))==-1){ //st for send text
+											 if((st=socket(AF_INET,SOCK_STREAM,0))==-1){ //st for send text
 										 		printf("Error in creating socket.\n");
 												}
 												int v=1;
 										 	 	setsockopt(st,SOL_SOCKET, SO_REUSEADDR, (char*) &v, sizeof(int));
 
-												bzero((char *) &sub_addr, sizeof(sub_addr));
+												bzero(&sub_addr, sizeof(sub_addr));
 
-												memcpy(&(sub_addr.sin_addr), aux1->addr, sizeof(aux1->addr));
+
+												sub_addr.sin_addr.s_addr=inet_addr(aux1->addr);
 												sub_addr.sin_family=AF_INET;
-												sub_addr.sin_port=ntohs(aux1->port);
+												sub_addr.sin_port=htons(aux1->port);
 
 												printf("Got here!\n");
-												fprintf(stderr,"  port %d \n",  aux1->port);
+												printf("  port %d \n",  aux1->port);
 
 												if(connect(st, (struct sockaddr *) &sub_addr, sizeof(sub_addr))==-1){
 													printf("Error in the connection to the subscriptor\n");
@@ -119,33 +126,46 @@ void * socketThread(void *arg){
 												}
 												printf("Got after connect!\n");
 
-												close(st);
 
-											 //Deliver text to the subscriptor of that node of the list.
+
+												if(send(st, &text, sizeof(text),0)==-1){
+													printf("Error on sending.\n");
+													exit(0);
+												}
+													close(st);
 										 }
 										 aux1=aux1->next;
 									 }
 									 if(!strcmp(aux1->topic,topic)){
 										 printf("Found a subscriber to the received topic\n");
+
 										 struct sockaddr_in sub_addr;
 										 int st;
-										 if((st=socket(AF_INET,SOCK_STREAM,6))==-1){ //st for send text
+										 if((st=socket(AF_INET,SOCK_STREAM,0))==-1){ //st for send text
 											printf("Error in creating socket.\n");
 											}
 											int v=1;
 											setsockopt(st,SOL_SOCKET, SO_REUSEADDR, (char*) &v, sizeof(int));
 
-											bzero((char *) &sub_addr, sizeof(sub_addr));
+											bzero(&sub_addr, sizeof(sub_addr));
 
-											memcpy(&(sub_addr.sin_addr), aux2->addr, sizeof(aux2->addr));
+											sub_addr.sin_addr.s_addr=inet_addr(aux1->addr);
 											sub_addr.sin_family=AF_INET;
-											sub_addr.sin_port=ntohs(aux2->port);
+											sub_addr.sin_port=htons(aux1->port);
 
 											printf("Got here!\n");
+											printf("  port %d \n",  aux1->port);
+
 											if(connect(st, (struct sockaddr *) &sub_addr, sizeof(sub_addr))==-1){
 												printf("Error in the connection to the subscriptor\n");
 												exit(0);
 											}
+
+											if(send(st, &text, sizeof(text),0)==-1){
+												printf("Error on sending.\n");
+												exit(0);
+											}
+
 											printf("Got after connect!\n");
 
 											close(st);
@@ -154,7 +174,7 @@ void * socketThread(void *arg){
 									 }
 								 }
 
-							 action_rcv=2;
+							 action_rcv=3;
 						 	}
 						 	else if(action_type==1){//SUBSCRIBE
 								char myport[128];
@@ -165,11 +185,20 @@ void * socketThread(void *arg){
 								 }
 
 								 port=atoi(myport);
-								 //if port <0 error
+
+								 if(port<0){
+									 printf("Error receiving the port of the subscriber\n");
+									 exit(0);
+								 }
+
+
 				 			 	strcpy(aux2->topic, topic);
 								struct sockaddr_in *s=(struct sockaddr_in*)&addr;
-								aux2->port=ntohs(port);
+								aux2->port=port;
 								inet_ntop(AF_INET,&s->sin_addr,aux2->addr,sizeof aux2->addr);
+
+								printf("Port received upon subscription: %d\n", port);
+								printf("Aux2 port: %d\n", aux2->port);
 
 								int return_value=0;
 								if(empty){
@@ -186,9 +215,8 @@ void * socketThread(void *arg){
 										while(aux1->next!=NULL&&(strcmp(aux1->addr,aux2->addr)!=0||strcmp(aux1->topic,aux2->topic)!=0)){
 											aux1=aux1->next;
 										}
-										if(strcmp(aux1->addr,aux2->addr)==0&&(strcmp(aux1->topic,aux2->topic)==0)){ //SUBSCRIPTION already EXISTS
+										if(!strcmp(aux1->addr,aux2->addr)&&(strcmp(aux1->topic,aux2->topic)==0)){ //SUBSCRIPTION already EXISTS
 											return_value=1;
-
 										}
 										else{
 										//Appending a new tuple topic/subscriber to the list.
@@ -208,7 +236,6 @@ void * socketThread(void *arg){
 							else{//UNSUBSCRIBE
 								strcpy(aux2->topic, topic);
 								struct sockaddr_in *s=(struct sockaddr_in*)&addr;
-								aux2->port=ntohs(s->sin_port);
 								inet_ntop(AF_INET,&s->sin_addr,aux2->addr,sizeof aux2->addr);
 								if(empty){
 									res=1;//TOPIC NOT FOUND
@@ -224,7 +251,7 @@ void * socketThread(void *arg){
 											aux1=aux1->next;
 										}
 										if(aux1==NULL){
-											printf("Error on sending.\n");
+											printf("Error on unsubscribing.\n");
 											res=1;//TOPIC NOT FOUND
 										}
 										else {
@@ -241,22 +268,11 @@ void * socketThread(void *arg){
 							}
 				}
 
-			 else if(action_rcv==2){
-				 //topic received
-				 action_rcv=3;
-				 printf("Waiting for text\n");
-				 if(readLine(newSocket, text, 1024)<0){
-	 				 perror("Error on receiving.\n");
-	 				 exit(0);
-	 			 }
-				 printf("TEXT: %s\n",text);
-			 }
-
 			 if(action_rcv==3){
 				 print_list();
 				 printf("--------------------------\n");
 			 }
-	 }
+
 	}
 close(newSocket);
 pthread_exit(NULL);

@@ -8,41 +8,29 @@ class MultithreadingDemo extends Thread
 {
 
   ServerSocket ssc;
-    public MultithreadingDemo (ServerSocket sc){
+  String thread_topic;
+    public MultithreadingDemo (ServerSocket sc, String topic){
         ssc=sc;
+        thread_topic=topic;
     }
 
     public void run(){
-      Scanner in=null;
         try{
-          System.out.println ("port " + ssc.getLocalPort());
+          //System.out.println ("port " + ssc.getLocalPort());
+          String line=null;
             while(true){
               Socket sc=ssc.accept();
-              in=new Scanner(sc.getInputStream());
-              String line=in.nextLine();
+              BufferedReader in= new BufferedReader(new InputStreamReader(sc.getInputStream()));
+              while((line=in.readLine())!=null){
 
-              System.out.println(line);
-              line=in.nextLine();
+              System.out.println("MESSAGE FROM <"+thread_topic+"> : <" +line+">");
             }
-
           }
-          catch(IOException e){
-          }
-
-
 
         }
-			/*	BufferedReader input=new BufferedReader(new InputStreamReader(istream));
-            while(true){
-							try{
-							input.readLine();
-						}
-							catch(Exception e){
-							System.out.print("Error in reading the text.\n");
-							System.exit(0);
-						}
-    			}*/
-				}
+          catch(IOException e){}
+      }
+}
 
 public class suscriptor{
 
@@ -77,7 +65,7 @@ public class suscriptor{
       ssc= new ServerSocket(0);
       sc_port=ssc.getLocalPort();
 
-  		MultithreadingDemo object = new MultithreadingDemo(ssc);
+  		MultithreadingDemo object = new MultithreadingDemo(ssc,topic);
       object.start();
 	}
 		catch(Exception e){
