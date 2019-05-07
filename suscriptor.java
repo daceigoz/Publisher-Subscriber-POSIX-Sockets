@@ -4,12 +4,12 @@ import java.util.*;
 import java.net.*;
 import gnu.getopt.Getopt;
 
-class MultithreadingDemo extends Thread
+class Multithread extends Thread
 {
 
   ServerSocket ssc;
   String thread_topic;
-    public MultithreadingDemo (ServerSocket sc, String topic){
+    public Multithread (ServerSocket sc, String topic){
         ssc=sc;
         thread_topic=topic;
     }
@@ -65,7 +65,7 @@ public class suscriptor{
       ssc= new ServerSocket(0);
       sc_port=ssc.getLocalPort();
 
-  		MultithreadingDemo object = new MultithreadingDemo(ssc,topic);
+  		Multithread object = new Multithread(ssc,topic);
       object.start();
 	}
 		catch(Exception e){
@@ -110,7 +110,7 @@ public class suscriptor{
 			istream=new DataInputStream(sc.getInputStream());
 	}
 		catch(Exception e){
-		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
+		System.out.print("Error in the connection to the broker <"+_server+">:<"+_port+">\n");
 		System.exit(0);
 	}
 		try{

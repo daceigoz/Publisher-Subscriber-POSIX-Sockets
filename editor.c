@@ -80,12 +80,6 @@ int main(int argc, char *argv[]) {
 		exit(0);
 	}
 
-/*
-	if(recv(sd, &res, sizeof(int),0)==-1){
-		printf("Error on receiving.\n");
-		exit(0);
-	}
-*/
 	if(writeLine(sd, topic, strlen(topic))==-1){
 		printf("Error on sending the topic.\n");
 		exit(0);
