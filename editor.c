@@ -55,26 +55,27 @@ int main(int argc, char *argv[]) {
 	printf("Topic: %s\n", topic);
 	printf("Text: %s\n", text);
 	int port_n=atoi(port);
-
+	//We create the socket
 	if((sd=socket(AF_INET,SOCK_STREAM,6))==-1){
 		printf("Error in creating socket.\n");
 		exit(0);
 	}
 
 	bzero((char*)&broker_addr, sizeof(broker_addr));
-	hp=gethostbyname(host);
+	hp=gethostbyname(host);//Convert the host address into the correct address structure
 
+	//The whole adress structure is made
 	memcpy(&(broker_addr.sin_addr),hp->h_addr,hp->h_length);
 	broker_addr.sin_family=AF_INET;
 	broker_addr.sin_port=htons(port_n);
 
-
+	//The editor is connected to the broker
 	if(connect(sd, (struct sockaddr *) &broker_addr, sizeof(broker_addr))==-1){
 		printf("Error in the connection to the server <%s>:<%d>\n",host,port_n);
 		exit(0);
 	}
 	printf("Connected to the server.\n");
-
+	//The action, topic and text are sent
 	if(writeLine(sd, action, strlen(action))==-1){
 		printf("Error on sending the action.\n");
 		exit(0);

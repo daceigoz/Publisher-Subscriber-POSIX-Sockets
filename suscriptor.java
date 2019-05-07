@@ -6,9 +6,10 @@ import gnu.getopt.Getopt;
 
 class Multithread extends Thread
 {
-
+  //Class for creating a thread to listen the notifications
   ServerSocket ssc;
   String thread_topic;
+    //Constructor to pass the server socket and the topic
     public Multithread (ServerSocket sc, String topic){
         ssc=sc;
         thread_topic=topic;
@@ -16,7 +17,7 @@ class Multithread extends Thread
 
     public void run(){
         try{
-          //System.out.println ("port " + ssc.getLocalPort());
+          //Accepting all the notifications from the broker and printing them
           String line=null;
             while(true){
               Socket sc=ssc.accept();
@@ -56,7 +57,7 @@ public class suscriptor{
     int sc_port=0;
 		res=1;
 		topic=topic+'\0';
-		// Write your code here
+    //Connection with the broker is established and the Thread is created.
 		try{
 			sc=new Socket(_server,_port);
 			s=new BufferedOutputStream(sc.getOutputStream());
@@ -72,6 +73,7 @@ public class suscriptor{
 		System.out.print("Error in the connection to the server <"+_server+">:<"+_port+">\n");
 		System.exit(0);
 	}
+    //The action, the topic and the ServerSocket of the thread are sent. Then, the result is read
 		try{
 			action="SUBSCRIBE"+'\0';
       String portbuf=String.valueOf(sc_port)+'\0';
@@ -90,12 +92,8 @@ public class suscriptor{
 		//0 if OK, 1 if fails
 		if(res==0){
 		System.out.println("SUBSCRIBE OK");
-
-
 	}
 		else System.out.println("SUBSCRIBE FAIL");
-
-
 		return res;
 	}
 
@@ -103,7 +101,7 @@ public class suscriptor{
 	{
 		res=1;
 		topic=topic+'\0';
-		// Write your code here
+		//Connection with the broker is established.
 		try{
 			sc=new Socket(_server,_port);
 			s=new BufferedOutputStream(sc.getOutputStream());
@@ -113,6 +111,7 @@ public class suscriptor{
 		System.out.print("Error in the connection to the broker <"+_server+">:<"+_port+">\n");
 		System.exit(0);
 	}
+  //The action and the topic are sent. Then, the result is read
 		try{
 			action="UNSUBSCRIBE"+'\0';
 			s.write(action.getBytes());
@@ -250,7 +249,7 @@ public class suscriptor{
 			return;
 		}
 
-
+    //Shell is initialised
 		shell();
 
 
