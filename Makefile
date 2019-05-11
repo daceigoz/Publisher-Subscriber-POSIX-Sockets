@@ -1,4 +1,4 @@
-BIN_FILES  = editor broker
+BIN_FILES  = editor broker server
 
 CC = gcc
 
@@ -16,8 +16,11 @@ all: $(BIN_FILES)
 editor: editor.o lines.o
 	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-broker: broker.o lines.o
-	$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+broker: broker.o lines.o rpc_functions.o
+	$(CC) $(LDFLAGS) broker.o lines.o rpc_functions.o $(LDLIBS) -o $@
+
+server: publications_clnt.o publications_xdr.o publications_svc.o publications_server.o
+	$(CC) $(LDFLAGS) publications_svc.o publications_xdr.o publications_server.o -o publications_server
 
 %.o: %.c
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c $<

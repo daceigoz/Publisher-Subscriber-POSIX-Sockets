@@ -7,9 +7,10 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
-#include<pthread.h>
+#include <pthread.h>
 #include "lines.h"
 #include "node_t.h"
+#include "rpc_functions.h"
 
 struct node * head=NULL; //Header of the list of subscriptions stored.
 int empty=1; //Variable defining whether the list is empty (1) of has contents (0)
@@ -170,10 +171,15 @@ void * socketThread(void *arg){
 													pthread_mutex_unlock(&mutex);
 													exit(0);
 												}
-
+											/*	//Delivering the topic to the subscriber:
+												if(send(st, &topic, sizeof(topic),0)==-1){
+													printf("Error on sending the topic.\n");
+													pthread_mutex_unlock(&mutex);
+													exit(0);
+												}*/
 												//Delivering the text to the subscriber:
 												if(send(st, &text, sizeof(text),0)==-1){
-													printf("Error on sending.\n");
+													printf("Error on sending the text.\n");
 													pthread_mutex_unlock(&mutex);
 													exit(0);
 												}
@@ -406,6 +412,9 @@ int main(int argc, char *argv[]) {
 	pthread_mutex_init(&mutex, NULL);
   pthread_mutex_init(&mutex_msg, NULL);
 	pthread_cond_init(&cond_msg, NULL);
+
+	//Initializing the RPC service:
+	init_service("172.0.0.1");
 
 	while(1){
 
