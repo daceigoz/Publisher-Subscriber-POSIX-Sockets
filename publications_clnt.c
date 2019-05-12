@@ -19,13 +19,11 @@ init_publication_1(int *clnt_res, CLIENT *clnt)
 }
 
 enum clnt_stat 
-get_publication_1(char *arg1, char *arg2, int *clnt_res,  CLIENT *clnt)
+get_publication_1(char *arg1, char **clnt_res,  CLIENT *clnt)
 {
-	get_publication_1_argument arg;
-	arg.arg1 = arg1;
-	arg.arg2 = arg2;
-	return (clnt_call (clnt, GET_PUBLICATION, (xdrproc_t) xdr_get_publication_1_argument, (caddr_t) &arg,
-		(xdrproc_t) xdr_int, (caddr_t) clnt_res,
+	return (clnt_call(clnt, GET_PUBLICATION,
+		(xdrproc_t) xdr_wrapstring, (caddr_t) &arg1,
+		(xdrproc_t) xdr_wrapstring, (caddr_t) clnt_res,
 		TIMEOUT));
 }
 

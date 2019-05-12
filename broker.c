@@ -142,6 +142,9 @@ void * socketThread(void *arg){
 
 									printf("TEXT: %s\n",text);
 
+									//Using the RPC to store the publication:
+									set_rpc_publication(topic, text, "localhost");
+
 									//Now the list will be traversed to find which susbscriptors must received the published message:
 								 if(!empty){
 									 aux1=head;
@@ -183,7 +186,8 @@ void * socketThread(void *arg){
 													pthread_mutex_unlock(&mutex);
 													exit(0);
 												}
-													close(st);
+
+												close(st);
 										 }
 										 aux1=aux1->next;
 									 }
@@ -296,6 +300,15 @@ void * socketThread(void *arg){
 									pthread_mutex_unlock(&mutex);
 									exit(0);
 								}
+
+								//Calling the RPC function for obtaining the last text from the subscribed topic:
+
+								char get_buffer[1024];
+								bzero(get_buffer, sizeof(get_buffer));
+								get_rpc_publication(topic, get_buffer, "localhost");
+								sleep(1);
+								printf("Value of get_buffer: %s\n", get_buffer);
+
 								action_rcv=3;
 							}
 
@@ -414,7 +427,7 @@ int main(int argc, char *argv[]) {
 	pthread_cond_init(&cond_msg, NULL);
 
 	//Initializing the RPC service:
-	init_service("172.0.0.1");
+	init_service("localhost");
 
 	while(1){
 

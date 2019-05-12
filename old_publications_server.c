@@ -4,11 +4,11 @@
  * as a guideline for developing your own functions.
  */
 
- #include <unistd.h>
- #include <sys/stat.h>
- #include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
- #include "publications.h"
+#include "publications.h"
 
 bool_t
 init_publication_1_svc(int *result, struct svc_req *rqstp)
@@ -28,7 +28,7 @@ init_publication_1_svc(int *result, struct svc_req *rqstp)
 }
 
 bool_t
-get_publication_1_svc(char *topic, char **result,  struct svc_req *rqstp)
+get_publication_1_svc(char *topic, char *broker_buffer, int *result,  struct svc_req *rqstp)
 {
 	bool_t retval=1;
 
@@ -36,33 +36,21 @@ get_publication_1_svc(char *topic, char **result,  struct svc_req *rqstp)
 
 	printf("The topic received was: %s\n", topic);
 
-	 char * file_path=(char *)malloc(strlen("./publications/")+strlen(topic));
-
+	 char file_path[strlen("./publications/")+strlen(topic)];
 	 sprintf(file_path, "%s%s", "./publications/",topic);
-	 printf("Value of file path: %s\n", file_path);
-
-	 //Creating a temporal buffer to store the read contents:
-	 char temp_buf[1024];
-	 bzero(temp_buf, sizeof(temp_buf));
-
 	 int fd=open(file_path, O_RDONLY);
-	 printf("Got after open\n");
 	 if(fd==-1){
 		 perror("Error opening the file or there is no file for the given topic.\n");
 	 }
-
 	 else{
-		 if((read(fd, &temp_buf, 1024)==-1)){
+		 if((read(fd, broker_buffer, 1024)==-1)){
 			 perror("Error reading the file.\n");
 		 }
-		 printf("got after read");
-		 printf("Value on the buffer: %s\n", temp_buf);
+		 printf("Value on the buffer: %s\n", broker_buffer);
 		 if(((close(fd)))==-1){
 			 perror("Error closing the file descriptor.\n");
 		 }
 	 }
-
-	 strcpy(*result, temp_buf);
 	 printf("--------------------------\n"); //Separator
 
 	return retval;

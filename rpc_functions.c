@@ -9,12 +9,14 @@
 
 void init_service(char *host){
 
+	printf("RPC: Calling init.\n");
+
 	CLIENT *clnt;
 	enum clnt_stat retval_1;
 	int result_1;
 
 	#ifndef	DEBUG
-		clnt = clnt_create (host, PUBLICATIONS, PUBLICATIONSVER, "udp");
+		clnt = clnt_create (host, PUBLICATIONS, PUBLICATIONSVER, "tcp");
 		if (clnt == NULL) {
 			clnt_pcreateerror (host);
 			exit (1);
@@ -34,24 +36,29 @@ void init_service(char *host){
 
 void get_rpc_publication(char * topic, char * buffer, char * host){
 
+	printf("RPC: Calling get.\n");
+
 	CLIENT *clnt;
 	enum clnt_stat retval_2;
-	int result_2;
+	char * result_2;
 	char *get_publication_1_arg1=topic;
-	char *get_publication_1_arg2=buffer;
 
 	#ifndef	DEBUG
-		clnt = clnt_create (host, PUBLICATIONS, PUBLICATIONSVER, "udp");
+		clnt = clnt_create (host, PUBLICATIONS, PUBLICATIONSVER, "tcp");
 		if (clnt == NULL) {
 			clnt_pcreateerror (host);
 			exit (1);
 		}
 	#endif	/* DEBUG */
 
-	retval_2 = get_publication_1(get_publication_1_arg1, get_publication_1_arg2, &result_2, clnt);
+	retval_2 = get_publication_1(get_publication_1_arg1, &result_2, clnt);
 	if (retval_2 != RPC_SUCCESS) {
 		clnt_perror (clnt, "call failed");
 	}
+
+	printf("Value of result2: %s\n", result_2);
+
+	strcpy(buffer, result_2);
 
 	#ifndef	DEBUG
 		clnt_destroy (clnt);
@@ -61,6 +68,8 @@ void get_rpc_publication(char * topic, char * buffer, char * host){
 
 void set_rpc_publication(char * topic, char * text, char * host){
 
+	printf("RPC: Calling set.\n");
+
 	CLIENT *clnt;
 	enum clnt_stat retval_3;
 	int result_3;
@@ -68,7 +77,7 @@ void set_rpc_publication(char * topic, char * text, char * host){
 	char *set_publication_1_arg2=text;
 
 	#ifndef	DEBUG
-		clnt = clnt_create (host, PUBLICATIONS, PUBLICATIONSVER, "udp");
+		clnt = clnt_create (host, PUBLICATIONS, PUBLICATIONSVER, "tcp");
 		if (clnt == NULL) {
 			clnt_pcreateerror (host);
 			exit (1);

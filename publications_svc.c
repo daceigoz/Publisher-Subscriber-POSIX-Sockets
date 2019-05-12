@@ -23,9 +23,9 @@ _init_publication_1 (void  *argp, void *result, struct svc_req *rqstp)
 }
 
 int
-_get_publication_1 (get_publication_1_argument *argp, void *result, struct svc_req *rqstp)
+_get_publication_1 (char * *argp, void *result, struct svc_req *rqstp)
 {
-	return (get_publication_1_svc(argp->arg1, argp->arg2, result, rqstp));
+	return (get_publication_1_svc(*argp, result, rqstp));
 }
 
 int
@@ -38,12 +38,12 @@ static void
 publications_1(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
-		get_publication_1_argument get_publication_1_arg;
+		char *get_publication_1_arg;
 		set_publication_1_argument set_publication_1_arg;
 	} argument;
 	union {
 		int init_publication_1_res;
-		int get_publication_1_res;
+		char *get_publication_1_res;
 		int set_publication_1_res;
 	} result;
 	bool_t retval;
@@ -62,8 +62,8 @@ publications_1(struct svc_req *rqstp, register SVCXPRT *transp)
 		break;
 
 	case GET_PUBLICATION:
-		_xdr_argument = (xdrproc_t) xdr_get_publication_1_argument;
-		_xdr_result = (xdrproc_t) xdr_int;
+		_xdr_argument = (xdrproc_t) xdr_wrapstring;
+		_xdr_result = (xdrproc_t) xdr_wrapstring;
 		local = (bool_t (*) (char *, void *,  struct svc_req *))_get_publication_1;
 		break;
 
