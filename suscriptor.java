@@ -28,6 +28,9 @@ class Multithread extends Thread
               Socket sc=ssc.accept();
               BufferedReader in= new BufferedReader(new InputStreamReader(sc.getInputStream()));
               while((line=in.readLine())!=null){
+              line = line.replaceAll("( )+", " ");//double spaces are removed
+
+
 
               System.out.println("MESSAGE FROM <"+thread_topic+"> : <" +line+">");
             }
