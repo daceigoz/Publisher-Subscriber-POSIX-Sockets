@@ -22,15 +22,26 @@ class Multithread extends Thread
 
     public void run(){
         try{
+          BigInteger number;
+          NumberConversion myservice=new NumberConversion();
+          NumberConversionSoapType port=myservice.getNumberConversionSoap();
+          String response=null;
           //Accepting all the notifications from the broker and printing them
           String line=null;
             while(true){//
               Socket sc=ssc.accept();
               BufferedReader in= new BufferedReader(new InputStreamReader(sc.getInputStream()));
               while((line=in.readLine())!=null){
-              line = line.replaceAll("( )+", " ");//double spaces are removed
+              line = line.trim().replaceAll(" +", " ");//double spaces are removed
 
-
+              Pattern p=Pattern.compile("\\d+");
+              Matcher m = p.matcher(line);
+              while(m.find()) {
+                number=m.group();
+                response=port.numberToWords(BigInteger.valueOf(number));
+                System.out.println(response);
+                line=line.replaceAll(number,number+" ("+response+")");
+              }
 
               System.out.println("MESSAGE FROM <"+thread_topic+"> : <" +line+">");
             }
@@ -266,11 +277,7 @@ public class suscriptor{
 			usage();
 			return;
 		}
-    BigInteger number=BigInteger.valueOf(1);
-    NumberConversion myservice=new NumberConversion();
-    NumberConversionSoapType port=myservice.getNumberConversionSoap();
-    String response=port.numberToWords(number);
-    System.out.println(response);
+
     //Shell is initialised
 		shell();
 
