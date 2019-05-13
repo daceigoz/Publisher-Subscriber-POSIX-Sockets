@@ -15,12 +15,6 @@ extern "C" {
 #endif
 
 
-struct get_publication_1_argument {
-	char *arg1;
-	char *arg2;
-};
-typedef struct get_publication_1_argument get_publication_1_argument;
-
 struct set_publication_1_argument {
 	char *arg1;
 	char *arg2;
@@ -35,8 +29,8 @@ typedef struct set_publication_1_argument set_publication_1_argument;
 extern  enum clnt_stat init_publication_1(int *, CLIENT *);
 extern  bool_t init_publication_1_svc(int *, struct svc_req *);
 #define GET_PUBLICATION 2
-extern  enum clnt_stat get_publication_1(char *, char *, int *, CLIENT *);
-extern  bool_t get_publication_1_svc(char *, char *, int *, struct svc_req *);
+extern  enum clnt_stat get_publication_1(char *, char **, CLIENT *);
+extern  bool_t get_publication_1_svc(char *, char **, struct svc_req *);
 #define SET_PUBLICATION 3
 extern  enum clnt_stat set_publication_1(char *, char *, int *, CLIENT *);
 extern  bool_t set_publication_1_svc(char *, char *, int *, struct svc_req *);
@@ -58,11 +52,9 @@ extern int publications_1_freeresult ();
 /* the xdr functions */
 
 #if defined(__STDC__) || defined(__cplusplus)
-extern  bool_t xdr_get_publication_1_argument (XDR *, get_publication_1_argument*);
 extern  bool_t xdr_set_publication_1_argument (XDR *, set_publication_1_argument*);
 
 #else /* K&R C */
-extern bool_t xdr_get_publication_1_argument ();
 extern bool_t xdr_set_publication_1_argument ();
 
 #endif /* K&R C */

@@ -5,18 +5,17 @@
  */
 
 #include "publications.h"
-#include "rpc_functions.h"
 
 
-void publications_1(char *host)
+void
+publications_1(char *host)
 {
 	CLIENT *clnt;
 	enum clnt_stat retval_1;
 	int result_1;
 	enum clnt_stat retval_2;
-	int result_2;
+	char *result_2;
 	char *get_publication_1_arg1;
-	char *get_publication_1_arg2;
 	enum clnt_stat retval_3;
 	int result_3;
 	char *set_publication_1_arg1;
@@ -34,7 +33,7 @@ void publications_1(char *host)
 	if (retval_1 != RPC_SUCCESS) {
 		clnt_perror (clnt, "call failed");
 	}
-	retval_2 = get_publication_1(get_publication_1_arg1, get_publication_1_arg2, &result_2, clnt);
+	retval_2 = get_publication_1(get_publication_1_arg1, &result_2, clnt);
 	if (retval_2 != RPC_SUCCESS) {
 		clnt_perror (clnt, "call failed");
 	}
@@ -48,7 +47,8 @@ void publications_1(char *host)
 }
 
 
-int main (int argc, char *argv[])
+int
+main (int argc, char *argv[])
 {
 	char *host;
 

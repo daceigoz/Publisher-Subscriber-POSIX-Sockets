@@ -34,6 +34,8 @@ get_publication_1_svc(char *topic, char **result,  struct svc_req *rqstp)
 
 	printf("GET\n");
 
+	*result=(char *)malloc(1024);
+
 	printf("The topic received was: %s\n", topic);
 
 	 char * file_path=(char *)malloc(strlen("./publications/")+strlen(topic));
