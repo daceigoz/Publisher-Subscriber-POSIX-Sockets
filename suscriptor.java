@@ -1,8 +1,13 @@
+
 import java.io.*;
 import java.lang.*;
 import java.util.*;
 import java.net.*;
 import gnu.getopt.Getopt;
+import java.math.BigInteger;
+import javax.jws.WebService;
+import javax.xml.namespace.QName;
+import com.dataaccess.webservicesserver.*;
 
 class Multithread extends Thread
 {
@@ -19,7 +24,7 @@ class Multithread extends Thread
         try{
           //Accepting all the notifications from the broker and printing them
           String line=null;
-            while(true){
+            while(true){//
               Socket sc=ssc.accept();
               BufferedReader in= new BufferedReader(new InputStreamReader(sc.getInputStream()));
               while((line=in.readLine())!=null){
@@ -258,7 +263,11 @@ public class suscriptor{
 			usage();
 			return;
 		}
-
+    BigInteger number=BigInteger.valueOf(1);
+    NumberConversion myservice=new NumberConversion();
+    NumberConversionSoapType port=myservice.getNumberConversionSoap();
+    String response=port.numberToWords(number);
+    System.out.println(response);
     //Shell is initialised
 		shell();
 
