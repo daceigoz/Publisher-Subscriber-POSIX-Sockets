@@ -308,7 +308,12 @@ void * socketThread(void *arg){
 								get_rpc_publication(topic, get_buffer, "localhost");
 								sleep(1);
 								printf("Value of get_buffer: %s\n", get_buffer);
-
+								
+								if(send(newSocket, &get_buffer, sizeof(get_buffer),0)==-1){
+									printf("Error on sending.\n");
+									pthread_mutex_unlock(&mutex);
+									exit(0);
+								}
 								action_rcv=3;
 							}
 

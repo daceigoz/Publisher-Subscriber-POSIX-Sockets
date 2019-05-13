@@ -56,13 +56,14 @@ public class suscriptor{
     ServerSocket ssc;
     int sc_port=0;
 		res=1;
+    BufferedReader instring=null;
 		topic=topic+'\0';
     //Connection with the broker is established and the Thread is created.
 		try{
 			sc=new Socket(_server,_port);
 			s=new BufferedOutputStream(sc.getOutputStream());
 			istream=new DataInputStream(sc.getInputStream());
-
+      instring= new BufferedReader(new InputStreamReader(sc.getInputStream()));
       ssc= new ServerSocket(0);
       sc_port=ssc.getLocalPort();
 
@@ -91,7 +92,16 @@ public class suscriptor{
 	}
 		//0 if OK, 1 if fails
 		if(res==0){
-		System.out.println("SUBSCRIBE OK");
+
+      String line=null;
+      try{
+        line=instring.readLine();
+          System.out.println("SUBSCRIBE OK: Last text from <"+topic+"> : <" +line+">");
+      }
+      catch(Exception e){
+  		System.out.print("NETWORK ERROR\n");
+  	}
+
 	}
 		else System.out.println("SUBSCRIBE FAIL");
 		return res;
