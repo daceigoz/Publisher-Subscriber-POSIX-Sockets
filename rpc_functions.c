@@ -25,7 +25,7 @@ void init_service(char *host){
 
 	retval_1 = init_publication_1(&result_1, clnt);
 	if (retval_1 != RPC_SUCCESS) {
-		clnt_perror (clnt, "call failed");
+		clnt_printf (clnt, "call failed");
 	}
 
 	#ifndef	DEBUG
@@ -53,7 +53,7 @@ void get_rpc_publication(char * topic, char * buffer, char * host){
 
 	retval_2 = get_publication_1(get_publication_1_arg1, &result_2, clnt);
 	if (retval_2 != RPC_SUCCESS) {
-		clnt_perror (clnt, "call failed");
+		clnt_printf (clnt, "call failed");
 	}
 
 	printf("Value of result2: %s\n", result_2);
@@ -86,7 +86,7 @@ void set_rpc_publication(char * topic, char * text, char * host){
 
 	retval_3 = set_publication_1(set_publication_1_arg1, set_publication_1_arg2, &result_3, clnt);
 	if (retval_3 != RPC_SUCCESS) {
-		clnt_perror (clnt, "call failed");
+		clnt_printf (clnt, "call failed");
 	}
 
 	#ifndef	DEBUG
@@ -119,15 +119,15 @@ void set_rpc_publication(char * topic, char * text, char * host){
 
 	retval_1 = init_publication_1(&result_1, clnt);
 	if (retval_1 != RPC_SUCCESS) {
-		clnt_perror (clnt, "call failed");
+		clnt_printf (clnt, "call failed");
 	}
 	retval_2 = get_publication_1(get_publication_1_arg1, get_publication_1_arg2, &result_2, clnt);
 	if (retval_2 != RPC_SUCCESS) {
-		clnt_perror (clnt, "call failed");
+		clnt_printf (clnt, "call failed");
 	}
 	retval_3 = set_publication_1(set_publication_1_arg1, set_publication_1_arg2, &result_3, clnt);
 	if (retval_3 != RPC_SUCCESS) {
-		clnt_perror (clnt, "call failed");
+		clnt_printf (clnt, "call failed");
 	}
 #ifndef	DEBUG
 	clnt_destroy (clnt);

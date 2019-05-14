@@ -50,17 +50,17 @@ get_publication_1_svc(char *topic, char **result,  struct svc_req *rqstp)
 	 int fd=open(file_path, O_RDONLY);
 	 printf("Got after open\n");
 	 if(fd==-1){
-		 perror("Error opening the file or there is no file for the given topic.\n");
+		 printf("Error opening the file or there is no file for the given topic.\n");
 	 }
 
 	 else{
 		 if((read(fd, &temp_buf, 1024)==-1)){
-			 perror("Error reading the file.\n");
+			 printf("Error reading the file.\n");
 		 }
 		 printf("got after read");
 		 printf("Value on the buffer: %s\n", temp_buf);
 		 if(((close(fd)))==-1){
-			 perror("Error closing the file descriptor.\n");
+			 printf("Error closing the file descriptor.\n");
 		 }
 	 }
 
@@ -90,17 +90,17 @@ set_publication_1_svc(char *topic, char *text, int *result,  struct svc_req *rqs
 	 printf("Value of filepath: %s\n", file_path);
 	 int fd=open(file_path, O_CREAT|O_RDWR|O_TRUNC, 0777);
 	 if(fd==-1){
-		 perror("The file cannot be created.\n");
+		 printf("The file cannot be created.\n");
 	 }
 	 else{
 		 char write_buf[1024];
 		 bzero(write_buf, sizeof(write_buf));
 		 strcpy(write_buf, text);
 		 if(((write(fd, write_buf, 1024)))==-1){
-			 perror("The topic cannot be written.\n");
+			 printf("The topic cannot be written.\n");
 		 }
 		 if(((close(fd)))==-1){
-			 perror("Error closing the file descriptor.\n");
+			 printf("Error closing the file descriptor.\n");
 		 }
 	 }
 	 printf("--------------------------\n"); //Separator

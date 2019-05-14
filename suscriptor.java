@@ -1,7 +1,7 @@
 
 import java.io.*;
 import java.lang.*;
-import java.util.*;
+import java.util.regex.*;
 import java.net.*;
 import gnu.getopt.Getopt;
 import java.math.BigInteger;
@@ -26,6 +26,8 @@ class Multithread extends Thread
           NumberConversion myservice=new NumberConversion();
           NumberConversionSoapType port=myservice.getNumberConversionSoap();
           String response=null;
+          Integer number_;
+          Integer length;
           //Accepting all the notifications from the broker and printing them
           String line=null;
             while(true){//
@@ -33,14 +35,15 @@ class Multithread extends Thread
               BufferedReader in= new BufferedReader(new InputStreamReader(sc.getInputStream()));
               while((line=in.readLine())!=null){
               line = line.trim().replaceAll(" +", " ");//double spaces are removed
-
+              //numbers are found and converted to words using the web service
               Pattern p=Pattern.compile("\\d+");
               Matcher m = p.matcher(line);
               while(m.find()) {
-                number=m.group();
-                response=port.numberToWords(BigInteger.valueOf(number));
-                System.out.println(response);
-                line=line.replaceAll(number,number+" ("+response+")");
+                number_=Integer.valueOf(m.group());
+                number=BigInteger.valueOf(number_);
+                response=port.numberToWords(number);
+                response=response.substring(0,(response.length()-1));
+                line=line.replaceAll(m.group(),m.group()+" ("+response+")");
               }
 
               System.out.println("MESSAGE FROM <"+thread_topic+"> : <" +line+">");
@@ -115,8 +118,10 @@ public class suscriptor{
       String line=null;
       try{
         line=instring.readLine();
+        if(line != null && !line.isEmpty()){
           System.out.println("SUBSCRIBE OK: Last text from <"+topic+"> : <" +line+">");
       }
+    }
       catch(Exception e){
   		System.out.print("NETWORK ERROR\n");
   	}

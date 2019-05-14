@@ -306,14 +306,14 @@ void * socketThread(void *arg){
 								char get_buffer[1024];
 								bzero(get_buffer, sizeof(get_buffer));
 								get_rpc_publication(topic, get_buffer, "localhost");
-								sleep(1);
 								printf("Value of get_buffer: %s\n", get_buffer);
-								
+								if(get_buffer!=NULL){
 								if(send(newSocket, &get_buffer, sizeof(get_buffer),0)==-1){
 									printf("Error on sending.\n");
 									pthread_mutex_unlock(&mutex);
 									exit(0);
 								}
+							}
 								action_rcv=3;
 							}
 
