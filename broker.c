@@ -218,7 +218,7 @@ void * socketThread(void *arg){
 											}
 
 											if(send(st, &text, sizeof(text),0)==-1){
-												printf("Error on sending.\n");
+												printf("Error on sending text.\n");
 												pthread_mutex_unlock(&mutex);
 												exit(0);
 											}

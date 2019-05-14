@@ -27,14 +27,15 @@ class Multithread extends Thread
           NumberConversionSoapType port=myservice.getNumberConversionSoap();
           String response=null;
           Integer number_;
-          Integer length;
+          Integer text=0;
+          String topic=null;
           //Accepting all the notifications from the broker and printing them
           String line=null;
             while(true){//
               Socket sc=ssc.accept();
               BufferedReader in= new BufferedReader(new InputStreamReader(sc.getInputStream()));
               while((line=in.readLine())!=null){
-              line = line.trim().replaceAll(" +", " ");//double spaces are removed
+                line = line.trim().replaceAll(" +", " ");//double spaces are removed
               //numbers are found and converted to words using the web service
               Pattern p=Pattern.compile("\\d+");
               Matcher m = p.matcher(line);
@@ -46,11 +47,12 @@ class Multithread extends Thread
                 line=line.replaceAll(m.group(),m.group()+" ("+response+")");
               }
 
-              System.out.println("MESSAGE FROM <"+thread_topic+"> : <" +line+">");
-            }
+              System.out.println("MESSAGE FROM <"+topic+"> : <" +line+">");
+
           }
 
         }
+      }
           catch(IOException e){}
       }
 }
