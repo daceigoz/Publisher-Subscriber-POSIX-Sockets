@@ -119,7 +119,7 @@ public class suscriptor{
       String line=null;
       try{
         line=instring.readLine();
-        if(line != null && !line.isEmpty()){
+        if(line != null && !line.trim().isEmpty()){
           System.out.println("SUBSCRIBE OK: Last text from <"+topic+"> : <" +line+">");
       }
     }
