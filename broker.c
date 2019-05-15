@@ -262,8 +262,8 @@ void * socketThread(void *arg){
 								aux2->port=port;
 								inet_ntop(AF_INET,&s->sin_addr,aux2->addr,sizeof aux2->addr);
 
-								printf("IP of the subscriber: %s\n", aux2->addr);
-								printf("Port of the subscriber: %d\n", port);
+								printf("IP of the unsubscriber: %s\n", aux2->addr);
+								printf("Port of the unsubscriber: %d\n", port);
 
 								//Storing the auxiliary node into the list:
 								int return_value=0;
@@ -275,7 +275,7 @@ void * socketThread(void *arg){
 								else{
 									//we also check if there is an equivalent node, so that it is not included:
 									if(strcmp(head->addr,aux2->addr)==0&&(strcmp(head->topic,aux2->topic)==0)){
-										return_value=1;
+										return_value=2;
 									}
 									else{
 
@@ -283,7 +283,7 @@ void * socketThread(void *arg){
 											aux1=aux1->next;
 										}
 										if(!strcmp(aux1->addr,aux2->addr)&&(strcmp(aux1->topic,aux2->topic)==0)){ //SUBSCRIPTION already EXISTS
-											return_value=1;
+											return_value=2;
 										}
 										else{
 											//Finally appending the node to the list:
@@ -321,6 +321,11 @@ void * socketThread(void *arg){
 
 							////////////////////UNSUBSCRIBE ACTION////////////////////
 							else if(action_type==2){
+								strcpy(aux2->topic, topic);
+								struct sockaddr_in *s=(struct sockaddr_in*)&addr;
+								inet_ntop(AF_INET,&s->sin_addr,aux2->addr,sizeof aux2->addr);
+
+								printf("IP of the unsubscriber: %s\n", aux2->addr);
 
 								//Searching in the list to unsubscribe the client from the given topic:
 								if(empty){

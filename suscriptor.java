@@ -28,7 +28,6 @@ class Multithread extends Thread
           String response=null;
           Integer number_;
           Integer text=0;
-          String topic=null;
           //Accepting all the notifications from the broker and printing them
           String line=null;
             while(true){//
@@ -47,7 +46,7 @@ class Multithread extends Thread
                 line=line.replaceAll(m.group(),m.group()+" ("+response+")");
               }
 
-              System.out.println("MESSAGE FROM <"+topic+"> : <" +line+">");
+              System.out.println("MESSAGE FROM <"+thread_topic+"> : <" +line+">");
 
           }
 
@@ -114,7 +113,7 @@ public class suscriptor{
 		catch(Exception e){
 		System.out.print("NETWORK ERROR\n");
 	}
-		//0 if OK, 1 if fails
+		//0 if OK, 1 if fails, 2 if already subscribe
 		if(res==0){
 
       String line=null;
@@ -129,7 +128,8 @@ public class suscriptor{
   	}
 
 	}
-		else System.out.println("SUBSCRIBE FAIL");
+		else if(res==1) System.out.println("SUBSCRIBE FAIL");
+    else System.out.println("SUBSCRIPTION ALREADY EXISTS");
 		return res;
 	}
 
